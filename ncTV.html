@@ -3,8 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Temperature View</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/boost-canvas.js"></script>
+    <script src="https://code.highcharts.com/modules/boost.js"></script>
+    <script src="js/main.js"></script>
 </head>
 <body>
 
+<div id="container" style="height: 800px; min-width: 1600px; max-width: 1600px; margin: 0 auto"></div>
+<script>
+
+    var chart2 = Highcharts.chart('container', {
+
+            chart: {
+                type: 'heatmap'
+            },
+
+
+            plotOptions: {
+                series: {
+                    point: {
+                        events: {
+                            click: function () {
+                                alert("!!!");
+                            }
+                        }
+                    }
+                }
+            },
+
+            title: {
+                text: 'Depth to Critical Temperature ' + criticalTemperatureCelsius + '°C',
+                align: 'left',
+                x: 40
+            },
+            xAxis: {
+                min: 0,
+                max:
+                columns
+            }
+            ,
+
+            yAxis: {
+                min: 0,
+                max:
+                rows,
+            }
+            ,
+
+            colorAxis: {
+                stops: [
+                    [0, '#8080ff'],
+                    [0.01, '#4040ff'],
+                    [criticalDepthMeters / 67, '#202088'],
+                    [criticalDepthMeters / 67 + 0.01, '#880088'],
+                    [0.97, '#880044'],
+                    [1.0, '#ff8080']
+                ],
+                min:
+                    0,
+                max:
+                    67,
+                startOnTick:
+                    false,
+                endOnTick:
+                    false
+
+            }
+            ,
+
+            series: [{
+                borderWidth: 0,
+                data: criticalDepths,
+                nullColor: '#EFEFEF',
+//                tooltip: {
+//                    pointFormat: '<b>{point.x},{point.y}: {point.value:.2f} m </b>'
+//                },
+            }]
+
+        })
+    ;
+
+</script>
 </body>
 </html>

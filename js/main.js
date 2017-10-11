@@ -35,8 +35,15 @@ function textFileToArray(filename) {
 }
 
 const depthsStart = 5;
+const criticalTemperatureCelsius = 19; // Temperature threshold of interest
+const criticalDepthMeters = 10;        // Depth threshold of interest
+
 var depths = [];
 var temperatures = [];
+var criticalDepths = [];
+var rows = 0;
+var columns = 0;
+var layers = 0;
 
 function getResults(url) {
     // !!!!! TEMPORARY READ FROM STATIC FILE
@@ -52,8 +59,11 @@ function getResults(url) {
 
         // Read depths
 
-        for (i = 0; i < strDepthsSplit[1]; i++) {
-            depths.push(responseText[depthsStart + 1 + i].split(",").slice(1, strDepthsSplit[3]));
+        rows = parseInt(strDepthsSplit[1]);
+        columns = parseInt(strDepthsSplit[3]);
+
+        for (i = 0; i < rows; i++) {
+            depths.push(responseText[depthsStart + 1 + i].replace(/ /g, '').split(",").slice(1, columns));
         }
 
         // Check for temperatures
@@ -67,18 +77,38 @@ function getResults(url) {
 
             // Read temperatures
 
-            for (i = 0; i < strTempsSplit[3]; i++) {
+            layers = parseInt(strTempsSplit[3]);
+            for (i = 0; i < layers; i++) {
                 var layer = [];
-                for (j = 0; j < strTempsSplit[5]; j++) {
+                for (j = 0; j < rows; j++) {
                     tempsStart++;
-                    layer.push(responseText[tempsStart].split(",").slice(1, strTempsSplit[7]));
+                    layer.push(responseText[tempsStart].replace(/ /g, '').split(",").slice(1, columns));
                 }
                 temperatures.push(layer);
             }
 
             // Build (1) depth to critical temperature
-
+            for (var i = 0; i < rows; i++) {
+                for (var j = 0; j < columns - 1; j++) {
+                    var result;
+                    if (depths[i][j] == "0.0")
+                        result = null;
+                    else if (temperatures[0][i][j] < criticalTemperatureCelsius)
+                        result = 0.0;
+                    else if (temperatures[layers - 1][i][j] > criticalTemperatureCelsius)
+                        result = 66;
+                    else {
+                        for (var k = 0; (k < columns) && (temperatures[k][i][j] > criticalTemperatureCelsius); k++) ;
+                        result = depths[i][j] * k / 20;
+                    }
+                    criticalDepths.push([j, i, result]);
+                }
+            }
             // Build (2) 3D regularly spaced array
+
+            // Build heatmap
+
+
         }
 
     }
