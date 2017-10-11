@@ -41,6 +41,7 @@ const criticalDepthMeters = 10;        // Depth threshold of interest
 var depths = [];
 var temperatures = [];
 var criticalDepths = [];
+var transect;
 var rows = 0;
 var columns = 0;
 var layers = 0;
@@ -87,7 +88,8 @@ function getResults(url) {
                 temperatures.push(layer);
             }
 
-            // Build (1) depth to critical temperature
+            // Build depth to critical temperature
+
             for (var i = 0; i < rows; i++) {
                 for (var j = 0; j < columns - 1; j++) {
                     var result;
@@ -104,16 +106,67 @@ function getResults(url) {
                     criticalDepths.push([j, i, result]);
                 }
             }
-            // Build (2) 3D regularly spaced array
 
-            // Build heatmap
+            // Build example transect
 
+            transect = buildTransect(22, 55, 50, 100);
+            transect = buildTransect(22, 9, 33, 23);
+            transect = buildTransect(67,121,55,152);
 
         }
 
     }
 
+}
 
+// ----- Build profile at (r,c) for transect
+//
+
+function addProfile(result, r, c, count) {
+
+    if (depths[r][c] > 0.0) {
+        result.push([count, 0, temperatures[0][r][c]]);
+        for (var d = 1; d < 66; d++) {
+            var sigma = (d / depths[r][c]);
+            if (sigma >= 0.95) {
+                value = null;
+            }
+            else {
+                var sigmaIndex = Math.floor(sigma * 20);
+                value = parseFloat(temperatures[sigmaIndex][r][c])
+                    + (20 * sigma - sigmaIndex) * (temperatures[sigmaIndex + 1][r][c] - temperatures[sigmaIndex][r][c]);
+                }
+            result.push([count, d, value])
+        }
+    }
+
+    return result;
+}
+
+// ----- Build transect
+//
+
+function buildTransect(r1, c1, r2, c2) {
+    var result = [];
+    var dr = r2 - r1;
+    var dc = c2 - c1;
+    var c, r;
+    if (dr > dc) {
+        c = c1;
+        for (r = r1; r <= r2; r++) {
+            result = addProfile(result, r, Math.floor(c + 0.5), r - r1);
+            c += dc / dr;
+        }
+    }
+    else {
+        r = r1;
+        for (c = c1; c <= c2; c++) {
+            result = addProfile(result, Math.floor(r + 0.5), c, c - c1);
+            r += dr / dc;
+        }
+    }
+    //alert(result);
+    return result;
 }
 
 // ----- Translate from sigma coordinate to actual depths and interpolate temperatures, calculate depth to critical

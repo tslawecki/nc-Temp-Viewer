@@ -15,7 +15,8 @@
 </head>
 <body>
 
-<div id="container" style="height: 800px; min-width: 1600px; max-width: 1600px; margin: 0 auto"></div>
+<div id="container" style="height: 600px; min-width: 1200px; max-width: 1200px; margin: 0 auto"></div>
+
 <script>
 
     var chart2 = Highcharts.chart('container', {
@@ -65,14 +66,10 @@
                     [0.97, '#880044'],
                     [1.0, '#ff8080']
                 ],
-                min:
-                    0,
-                max:
-                    67,
-                startOnTick:
-                    false,
-                endOnTick:
-                    false
+                min: 0,
+                max: 67,
+                startOnTick: false,
+                endOnTick: false
 
             }
             ,
@@ -81,9 +78,68 @@
                 borderWidth: 0,
                 data: criticalDepths,
                 nullColor: '#EFEFEF',
-//                tooltip: {
-//                    pointFormat: '<b>{point.x},{point.y}: {point.value:.2f} m </b>'
-//                },
+                tooltip: {
+                    pointFormat: '<b>{point.x},{point.y}: {point.value:.2f} m </b>'
+                }
+            }]
+
+        })
+    ;
+
+</script>
+
+<div id="container2" style="height: 400px; min-width: 600px; max-width: 600px; margin: 0 auto"></div>
+
+<script>
+
+    var chart1 = Highcharts.chart('container2', {
+
+            chart: {
+                type: 'heatmap'
+            },
+
+            title: {
+                text: 'Temperature transect',
+                align: 'left',
+                x: 40
+            },
+
+            xAxis: {
+                visible: false
+            },
+        
+            yAxis: {
+                min: 0,
+                max: 67,
+                endOnTick: false,
+                reversed: true
+            },
+
+            colorAxis: {
+                stops: [
+                    [0, '#000088'],
+
+                    [criticalTemperatureCelsius / 30 - 0.0011, '#0000ff'],
+//                    [criticalTemperatureCelsius/30-0.0010, '#ffff00'],
+//                    [criticalTemperatureCelsius/30, '#ffff00'],
+//                    [criticalTemperatureCelsius / 30 + 0.0010,'#ffff00'],
+                    [criticalTemperatureCelsius / 30 + 0.0011, '#8800ff'],
+                    [1.0, '#ff0000']
+                ],
+                min: 0,
+                max: 30,
+                startOnTick: false,
+                endOnTick: false
+            }
+            ,
+
+            series: [{
+                borderWidth: 0,
+                data: transect,
+                nullColor: '#EFEFEF',
+                tooltip: {
+                    pointFormat: '<b>{point.x},{point.y}: {point.value:.2f}°C </b>'
+                }
             }]
 
         })
