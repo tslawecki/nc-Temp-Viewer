@@ -35,8 +35,8 @@ function textFileToArray(filename) {
 }
 
 const depthsStart = 5;
-const criticalTemperatureCelsius = 19; // Temperature threshold of interest
-const criticalDepthMeters = 10;        // Depth threshold of interest
+const criticalTemperatureCelsius = 16.67; // Temperature threshold of interest
+const criticalDepthMeters = 13;        // Depth threshold of interest
 
 var depths = [];
 var temperatures = [];
@@ -95,7 +95,7 @@ function getResults(url) {
                     var result;
                     if (depths[i][j] == "0.0")
                         result = null;
-                    else if (temperatures[0][i][j] < criticalTemperatureCelsius)
+                    else if (temperatures[0][i][j] < 14.44)
                         result = 0.0;
                     else if (temperatures[layers - 1][i][j] > criticalTemperatureCelsius)
                         result = 66;
@@ -147,6 +147,7 @@ function addProfile(result, r, c, count) {
 //
 
 function buildTransect(r1, c1, r2, c2) {
+
     var result = [];
     var dr = r2 - r1;
     var dc = c2 - c1;

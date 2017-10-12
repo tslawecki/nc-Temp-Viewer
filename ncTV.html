@@ -9,40 +9,78 @@
     <script src="https://code.highcharts.com/modules/heatmap.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/data.js"></script>
-    <script src="https://code.highcharts.com/modules/boost-canvas.js"></script>
-    <script src="https://code.highcharts.com/modules/boost.js"></script>
     <script src="js/main.js"></script>
 </head>
 <body>
 
-<div id="container" style="height: 600px; min-width: 1200px; max-width: 1200px; margin: 0 auto"></div>
 
+<table>
+    <tr>
+        <td colspan="2">
+            <div id="container" style="height: 600px; min-width: 1200px; max-width: 1200px; margin: 0 auto"></div>
+        </td>
+    </tr>
+    </tr>
+    <tr>
+        <td>
+            <div id="container2" style="height: 400px; min-width: 600px; max-width: 600px; margin: 0 auto"></div>
+        </td>
+        <td>
+            <div id="container3" style="height: 400px; min-width: 300px; max-width: 300px; margin: 0 auto"></div>
+
+        </td>
+    </tr>
+</table>
 <script>
+
+    var tr1, tr2, tc1, tc2;
+    var pointsSelected = [];
 
     var chart2 = Highcharts.chart('container', {
 
-            chart: {
-                type: 'heatmap'
-            },
-
-
             plotOptions: {
+
+                heatmap: {borderWidth: 0},
+                scatter: {
+                    lineWidth: 2
+
+                },
+
                 series: {
-                    point: {
-                        events: {
-                            click: function () {
-                                alert("!!!");
+                    events: {
+                        click: function (e) {
+                            if (pointsSelected.length == 2) {
+                                pointsSelected.length = 0;
                             }
+                            pointsSelected.push([[event.chartX, event.chartY], [event.point.x, event.point.y]]);
+                            if (pointsSelected.length == 1) {
+                                chart2.series[1].setData([pointsSelected[0][1]]);
+                            }
+                            else {
+                                chart2.series[1].setData([pointsSelected[0][1], pointsSelected[1][1]]);
+                                transect = buildTransect(pointsSelected[0][1][1],
+                                    pointsSelected[0][1][0],
+                                    pointsSelected[1][1][1],
+                                    pointsSelected[1][1][0]);
+                                chart1.series[0].setData(transect);
+                                chart1.redraw;
+                            }
+                            chart2.redraw;
+
                         }
                     }
                 }
             },
 
-            title: {
-                text: 'Depth to Critical Temperature ' + criticalTemperatureCelsius + '°C',
-                align: 'left',
-                x: 40
-            },
+            title:
+                {
+                    text: 'Depth to Critical Temperature ' + criticalTemperatureCelsius + '°C',
+                    align:
+                        'left',
+                    x:
+                        40
+                }
+            ,
             xAxis: {
                 min: 0,
                 max:
@@ -52,51 +90,51 @@
 
             yAxis: {
                 min: 0,
-                max:
-                rows,
+                max: rows,
+                gridLineWidth: 0,
+                minorGridLineWidth: 0
             }
             ,
 
             colorAxis: {
                 stops: [
-                    [0, '#8080ff'],
+                    [0, '#c0c0ff'],
                     [0.01, '#4040ff'],
                     [criticalDepthMeters / 67, '#202088'],
                     [criticalDepthMeters / 67 + 0.01, '#880088'],
                     [0.97, '#880044'],
                     [1.0, '#ff8080']
                 ],
-                min: 0,
-                max: 67,
-                startOnTick: false,
-                endOnTick: false
-
+                min:
+                    0,
+                max:
+                    67,
+                startOnTick:
+                    false,
+                endOnTick:
+                    false
             }
             ,
 
             series: [{
+                pixelSpacing: [0, 0, 0, 0],
+                type: 'heatmap',
                 borderWidth: 0,
                 data: criticalDepths,
                 nullColor: '#EFEFEF',
                 tooltip: {
                     pointFormat: '<b>{point.x},{point.y}: {point.value:.2f} m </b>'
                 }
-            }]
-
+            },
+                {
+                    type: 'scatter'
+                }
+            ]
         })
     ;
 
-</script>
-
-<div id="container2" style="height: 400px; min-width: 600px; max-width: 600px; margin: 0 auto"></div>
-
-<script>
 
     var chart1 = Highcharts.chart('container2', {
-
-            chart: {
-                type: 'heatmap'
-            },
 
             title: {
                 text: 'Temperature transect',
@@ -107,40 +145,102 @@
             xAxis: {
                 visible: false
             },
-        
+
             yAxis: {
                 min: 0,
                 max: 67,
                 endOnTick: false,
-                reversed: true
+                reversed: true,
+                title: {text: "Depth (m)"}
             },
 
             colorAxis: {
                 stops: [
                     [0, '#000088'],
-
-                    [criticalTemperatureCelsius / 30 - 0.0011, '#0000ff'],
-//                    [criticalTemperatureCelsius/30-0.0010, '#ffff00'],
-//                    [criticalTemperatureCelsius/30, '#ffff00'],
-//                    [criticalTemperatureCelsius / 30 + 0.0010,'#ffff00'],
-                    [criticalTemperatureCelsius / 30 + 0.0011, '#8800ff'],
+                    [14.444 / 30 - 0.0011, '#0000ff'],
+                    [14.444 / 30, '#888800'],
+                    [15.556 / 30, "#ffff00"],
+                    [16.667 / 30, '#88ff00'],
+                    [16.667 / 30 + 0.0011, '#8800ff'],
                     [1.0, '#ff0000']
                 ],
                 min: 0,
                 max: 30,
                 startOnTick: false,
-                endOnTick: false
+                endOnTick: false,
+
+                title: {text: "Temperature (°C)"}
             }
             ,
+            tooltip: {
+                formatter: function () {
+                    var data = [];
 
-            series: [{
-                borderWidth: 0,
-                data: transect,
-                nullColor: '#EFEFEF',
-                tooltip: {
-                    pointFormat: '<b>{point.x},{point.y}: {point.value:.2f}°C </b>'
+                    for (var i = 0; i < transect.length; i++) {
+                        if (transect[i][0] == this.point.x)
+                            if (transect[i][2] != null) {
+                                console.log(transect[i][0] + " " + transect[i][1] + " " + transect[i][2]);
+
+                                data.push([transect[i][2], transect[i][1]]);
+                            }
+                    }
+
+                    chart3.series[0].setData(data);
+                    chart3.update;
+                    return '<b>' + this.point.x + ',' + this.y + ': ' + this.point.value + '°C </b>';
                 }
-            }]
+            }
+            ,
+            series: [
+                {
+                    type: 'heatmap',
+                    borderWidth: 0,
+                    data: transect,
+                    nullColor: '#EFEFEF'
+                }
+            ]
+
+        })
+    ;
+    var chart3 = Highcharts.chart('container3', {
+
+            title: {
+                text: 'Temperature profile',
+                align: 'left',
+                x: 40
+            },
+
+            xAxis: {
+                min: 0,
+                max: 30
+
+            },
+
+            yAxis: {
+                min: 0,
+                max: 67,
+                endOnTick: false,
+                reversed: true,
+                title: {text: "Depth (m)"}
+            },
+
+
+            series: [
+                {
+                    type: 'scatter',
+                    borderWidth: 0,
+                    data: null,
+                    nullColor: '#EFEFEF',
+                    tooltip: {
+                        pointFormat: '<b>{point.x},{point.y}: {point.value:.2f}°C </b>'
+                    }
+                },
+                {
+                    type: 'scatter',
+                    data: [[14.44, 0], [14.44, 67], [16.67, 67], [16.67, 0]],
+                    lineWidth: 0.1,
+                    marker: {radius: 0}
+                }]
 
         })
     ;
